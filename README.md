@@ -19,7 +19,9 @@ A tutorial example for the CSTR unit is detailed in the case study section, and 
 
 # Test it on your device
 To run the KKT-hPINN and compare it with non-constrained NN and soft-constrained PINN
+
 ```python main.py --dataset_type cstr --dataset_path benchmark_CSTR.csv --job repeat```
+
 For other setups: --dataset_type can be either cstr, plant or distillation; --dataset_path can be either benchmark_CSTR.csv, benchmark_plant.csv or benchmark_distillation.csv; Adjust the hyperparameters correspondingly.
 
 # Citation
