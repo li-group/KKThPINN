@@ -1,7 +1,7 @@
 # KKT-hPINN: Physics-Informed Neural Networks with Hard Linear Equality Constraints for Surrogate Modeling
 Welcome to the KKT-hPINN paper page. This code belongs to a paper currently under review, and the preprint can be found at arxiv:
 
-If you found this work useful, please cite this preprint 🚀:
+If you found this work useful, please cite this preprint ❤️:
 ```bibtex
 @misc{chen2024physicsinformed,
       title={Physics-Informed Neural Networks with Hard Linear Equality Constraints}, 
@@ -31,15 +31,3 @@ To run the KKT-hPINN and compare it with non-constrained NN and soft-constrained
 
 For other setups: --dataset_type can be either cstr, plant or distillation; --dataset_path can be either benchmark_CSTR.csv, benchmark_plant.csv or benchmark_distillation.csv; Adjust the hyperparameters correspondingly.
 
-# Citation
-Cite us ❤️
-```bibtex
-@misc{chen2024physicsinformed,
-      title={Physics-Informed Neural Networks with Hard Linear Equality Constraints}, 
-      author={Hao Chen and Gonzalo E. Constante Flores and Can Li},
-      year={2024},
-      eprint={2402.07251},
-      archivePrefix={arXiv},
-      primaryClass={cs.LG}
-}
-```
