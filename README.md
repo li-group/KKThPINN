@@ -1,7 +1,7 @@
 # KKT-hPINN: Physics-Informed Neural Networks with Hard Linear Equality Constraints for Surrogate Modeling
-Welcome to the KKT-hPINN paper page. This code belongs to a paper currently under review, and the preprint can be found at arxiv:
+Welcome to the KKT-hPINN paper page. This code belongs to a paper currently under review, and the preprint can be found at arxiv: [https://arxiv.org/abs/2402.07251](https://arxiv.org/abs/2402.07251)
 
-If you found this work useful, please cite this preprint ❤️:
+If you found this work useful, please cite this [preprint](https://arxiv.org/abs/2402.07251) ❤️:
 ```bibtex
 @misc{chen2024physicsinformed,
       title={Physics-Informed Neural Networks with Hard Linear Equality Constraints}, 
@@ -14,7 +14,7 @@ If you found this work useful, please cite this preprint ❤️:
 ```
 
 # Overview
-In this work, we develop a novel hard-constrained PINN architecture, KKT-hPINN, that always satisfies hard linear equality constraints in both training and testing processes. The architecture consists of a traditional neural network and two non-trainable projection layers that orthogonally project model predictions onto a feasible region of predefined linear equality constraints.
+In this work, we develop a novel **hard-constrained PINN architecture, KKT-hPINN, that always satisfies hard linear equality constraints in both training and testing processes**. The architecture consists of a traditional neural network and two non-trainable projection layers that orthogonally project model predictions onto a feasible region of predefined linear equality constraints.
 
 In all case studies, KKT-hPINN demonstrates enhanced predictive capability as surrogate models, while strictly satisfying hard linear equality constraints without introducing additional hyperparameters and computational cost.
 
