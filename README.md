@@ -3,7 +3,14 @@ Welcome to the KKT-hPINN paper page. This code belongs to a paper currently unde
 
 If you found this work useful, please cite this preprint 🚀:
 ```bibtex
-
+@misc{chen2024physicsinformed,
+      title={Physics-Informed Neural Networks with Hard Linear Equality Constraints}, 
+      author={Hao Chen and Gonzalo E. Constante Flores and Can Li},
+      year={2024},
+      eprint={2402.07251},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG}
+}
 ```
 
 # Overview
@@ -27,5 +34,12 @@ For other setups: --dataset_type can be either cstr, plant or distillation; --da
 # Citation
 Cite us ❤️
 ```bibtex
-
+@misc{chen2024physicsinformed,
+      title={Physics-Informed Neural Networks with Hard Linear Equality Constraints}, 
+      author={Hao Chen and Gonzalo E. Constante Flores and Can Li},
+      year={2024},
+      eprint={2402.07251},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG}
+}
 ```
