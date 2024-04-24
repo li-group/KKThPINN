@@ -21,13 +21,17 @@ In all case studies, KKT-hPINN demonstrates enhanced predictive capability as su
 # Installation
 ```pip install -r requirements.txt```
 
-# Tutorial
-A tutorial example for the CSTR unit is detailed in the case study section, and you can access the corresponding illustrative Jupyter notebook code in this repository.
-
 # Test it on your device
 To run the KKT-hPINN and compare it with non-constrained NN and soft-constrained PINN
 
-```python main.py --dataset_type cstr --dataset_path benchmark_CSTR.csv --job repeat```
+```python main.py --model_id MODELID --dataset_type plant --dataset_path benchmark_plant.csv --job experiment```
 
 For other setups: --dataset_type can be either cstr, plant or distillation; --dataset_path can be either benchmark_CSTR.csv, benchmark_plant.csv or benchmark_distillation.csv; Adjust the hyperparameters correspondingly.
+
+```mkdir data models```
+```mkdir data/learning_curves data/tables```
+Create their sub-folders for the specific dataset, model, val_ratio in the following order if they do not exist.
+```mkdir data/learning_curves/dataset/model/val_ratio```
+```mkdir data/tables/dataset/model/val_ratio```
+```mkdir models/dataset/model/val_ratio```
 
