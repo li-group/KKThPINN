@@ -29,9 +29,14 @@ To run the KKT-hPINN and compare it with non-constrained NN and soft-constrained
 For other setups: --dataset_type can be either cstr, plant or distillation; --dataset_path can be either benchmark_CSTR.csv, benchmark_plant.csv or benchmark_distillation.csv; Adjust the hyperparameters correspondingly.
 
 ```mkdir data models```
+
 ```mkdir data/learning_curves data/tables```
+
 Create their sub-folders for the specific dataset, model, val_ratio in the following order if they do not exist.
+
 ```mkdir data/learning_curves/dataset/model/val_ratio```
+
 ```mkdir data/tables/dataset/model/val_ratio```
+
 ```mkdir models/dataset/model/val_ratio```
 
