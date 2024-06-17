@@ -67,3 +67,43 @@ class NNOPT(nn.Module):
         for module in self.modules():
             if isinstance(module, nn.Linear) and module is not self.fc_fixed1 and module is not self.fc_fixed2:
                 module.reset_parameters()
+
+
+class ECNN(nn.Module):
+    def __init__(self, input_dim, hidden_dim, hidden_num, z0_dim, A, B_indep, B_dep, b):
+        super(ECNN, self).__init__()
+        self.A = A
+        self.B_indep = B_indep
+        self.B_dep = B_dep
+        self.b = b
+
+        self.B_dep_inverse = torch.inverse(B_dep)
+        self.Astar = - torch.mm(self.B_dep_inverse, self.A)
+        self.Bstar = - torch.mm(self.B_dep_inverse, self.B_indep)
+        self.bstar = torch.matmul(self.B_dep_inverse, b).squeeze(-1)
+
+        self.layers = nn.ModuleList()
+        self.layers.append(nn.Linear(input_dim, hidden_dim))
+        for _ in range(hidden_num - 1):
+            self.layers.append(nn.Linear(hidden_dim, hidden_dim))
+        self.layers.append(nn.Linear(hidden_dim, self.B_indep.shape[1]))
+
+        self.fc_fixed1 = nn.Linear(self.B_indep.shape[1], self.B_dep.shape[1], bias=False)  ########
+        self.fc_fixed1.weight = nn.Parameter(self.Bstar, requires_grad=False)
+        self.fc_fixed2 = nn.Linear(input_dim, self.B_dep.shape[1], bias=False)  ########
+        self.fc_fixed2.weight = nn.Parameter(self.Astar, requires_grad=False)
+        self.fc_fixed2.bias = nn.Parameter(self.bstar, requires_grad=False)
+
+    def forward(self, x):
+        x0 = x
+        for layer in self.layers[:-1]:
+            x = F.relu(layer(x))
+        z_indep = self.layers[-1](x)
+        z_dep = self.fc_fixed1(z_indep) + self.fc_fixed2(x0)
+        z = torch.cat((z_dep, z_indep), dim=1)
+        return z
+
+    def reset_parameters(self):
+        for module in self.modules():
+            if isinstance(module, nn.Linear) and module is not self.fc_fixed1 and module is not self.fc_fixed2:
+                module.reset_parameters()

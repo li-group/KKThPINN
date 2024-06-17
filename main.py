@@ -26,6 +26,7 @@ def add_arguments():
     parser.add_argument("--eta", default=0.8, type=float)
     parser.add_argument("--sigma", default=2, type=float)
     parser.add_argument("--mu_safe", default=1e+9, type=float)
+    parser.add_argument("--dtype", default=32, type=int)
 
     parser.add_argument('--dataset_type', type=str, help='choose from cstr, plant, distillation')
     parser.add_argument('--dataset_path', type=str)
@@ -47,6 +48,8 @@ def main(args):
             args.loss_type = 'MSE'
         elif args.model == 'AugLagNN':
             args.loss_type = 'MSE'
+        elif args.model == 'ECNN':
+            args.loss_type = 'MSE'
 
         args.run = 0
         data = LoadData(args)
@@ -54,13 +57,15 @@ def main(args):
 
     elif args.job == 'experiment':
         for i in range(args.runs):
-            for model_name in ['NN', 'PINN', 'KKThPINN']:
+            for model_name in ['NN', 'PINN', 'KKThPINN', 'ECNN']:
                 args.model = model_name
                 if args.model == 'NN':
                     args.loss_type = 'MSE'
                 elif args.model == 'PINN':
                     args.loss_type = 'PINN'
                 elif args.model == 'KKThPINN':
+                    args.loss_type = 'MSE'
+                elif args.model == 'ECNN':
                     args.loss_type = 'MSE'
 
                 args.run = i

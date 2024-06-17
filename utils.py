@@ -6,7 +6,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from torch.utils import data
-from models import NN, NNOPT
+from models import NN, NNOPT, ECNN
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -24,11 +24,30 @@ def LoadData(args):
     else:
         raise ValueError('Dataset not supported!')
 
+    if args.dtype == 32:
+        dataset_arr = dataset_arr.astype(np.float32)
     dataset = Data_class(dataset_arr)
     dataset.resplit_data(args.val_ratio)
 
     A, B, b = get_scaledABb(dataset.A, dataset.B, dataset.b, scaler)
+
+    if args.dtype == 32:
+        A, B, b = A.float(), B.float(), b.float()
+    else:
+        A, B, b = A.double(), B.double(), b.double()
     print(f'type of A: {A.dtype}, type of B: {B.dtype}, type of b: {b.dtype}')
+
+    if args.dataset_type == 'cstr':
+        B_dep = B[:, :2]
+        B_indep = B[:, 2:]
+    elif args.dataset_type == 'plant':
+        B_dep = B[:, :1]
+        B_indep = B[:, 1:]
+    elif args.dataset_type == 'distillation':
+        B_dep = B[:, :2]
+        B_indep = B[:, 2:]
+    else:
+        raise ValueError('Dataset not supported!')
 
     params = {'batch_size': args.batch_size,
               'shuffle': True}
@@ -41,8 +60,8 @@ def LoadData(args):
     data_dict = {'train_loader': train_loader, 'val_loader': val_loader, 'test_loader': test_loader,
                  'dataset': dataset, 'A': A, 'B': B, 'b': b.unsqueeze(1),
                  'constrained_indexes': dataset.constrained_indexes,
-                 'unconstrained_indexes': dataset.unconstrained_indexes,}
-
+                 'unconstrained_indexes': dataset.unconstrained_indexes,
+                 'B_dep': B_dep, 'B_indep': B_indep}
     return data_dict
 
 
@@ -54,7 +73,16 @@ def LoadModel(args, data):
     elif args.model == 'KKThPINN':
         model = NNOPT(args.input_dim, args.hidden_dim, args.hidden_num, args.z0_dim,
                       data['A'], data['B'], data['b'])
-    model = model.double().to(device)
+    elif args.model == 'ECNN':
+        model = ECNN(args.input_dim, args.hidden_dim, args.hidden_num, args.z0_dim,
+                     data['A'], data['B_indep'], data['B_dep'], data['b'])
+    else:
+        raise ValueError('Model not supported!')
+
+    if args.dtype == 32:
+        model = model.to(device)
+    else:
+        model = model.double().to(device)
     return model
 
 
@@ -114,16 +142,16 @@ def get_scaledABb(A, B, b, scaler):
 
 class Data_cstr(data.Dataset):
     def __init__(self, dataset):
-        self.dataset_tensor = torch.from_numpy(dataset).double()
+        self.dataset_tensor = torch.from_numpy(dataset)
         self.X = self.dataset_tensor[:, :3]
         self.Y = self.dataset_tensor[:, 3:]
         self.train_set, self.val_set, self.test_set = self.split_data(0.2)  # initial val_ratio -> 0.2
 
         self.A = torch.tensor([[0, 1, -1],
-                                [0, 1, 0]]).double()  # (2, 3)
+                                [0, 1, 0]])  # (2, 3)
         self.B = torch.tensor([[0, -1, 1],
-                                [-1, -1, 0]]).double()  # (2, 3)
-        self.b = torch.tensor([0, 0]).double()
+                                [-1, -1, 0]])  # (2, 3)
+        self.b = torch.tensor([0, 0])
 
         self.constrained_indexes = list(set([index for index in torch.nonzero(self.B)[:, -1].tolist()]))
         self.unconstrained_indexes = [item for item in range(self.B.shape[1]) if item not in self.constrained_indexes]
@@ -151,14 +179,14 @@ class Data_cstr(data.Dataset):
 
 class Data_plant(data.Dataset):
     def __init__(self, dataset):
-        self.dataset_tensor = torch.from_numpy(dataset).double()
+        self.dataset_tensor = torch.from_numpy(dataset)
         self.X = self.dataset_tensor[:, :4]
         self.Y = self.dataset_tensor[:, 4:]
         self.train_set, self.val_set, self.test_set = self.split_data(0.2)  # initial val_ratio -> 0.2
 
-        self.A = torch.tensor([[1, 1, 1, -1]]).double()  # (1, 4)
-        self.B = torch.tensor([[-1, 0, -1, 0, -1]]).double()  # (1, 5)
-        self.b = torch.tensor([0]).double()  # (1, )
+        self.A = torch.tensor([[1., 1., 1., -1.]])  # (1, 4)
+        self.B = torch.tensor([[-1., 0., -1., 0., -1.]])  # (1, 5)
+        self.b = torch.tensor([0.])  # (1, )
 
         self.constrained_indexes = list(set([index for index in torch.nonzero(self.B)[:, -1].tolist()]))
         self.unconstrained_indexes = [item for item in range(self.B.shape[1]) if item not in self.constrained_indexes]
@@ -186,16 +214,16 @@ class Data_plant(data.Dataset):
 
 class Data_distillation(data.Dataset):
     def __init__(self, dataset):
-        self.dataset_tensor = torch.from_numpy(dataset).double()
+        self.dataset_tensor = torch.from_numpy(dataset)
         self.X = self.dataset_tensor[:, :5]
         self.Y = self.dataset_tensor[:, 5:]
         self.train_set, self.val_set, self.test_set = self.split_data(0.2)  # initial val_ratio -> 0.2
 
         self.A = torch.tensor([[0, 0, 1, 0, 0],
-                                [0, 0, 0, 0, 1]]).double()  # (2, 5)
+                                [0, 0, 0, 0, 1]])  # (2, 5)
         self.B = torch.tensor([[-1, 0, 0, 0, 0, 0, -1, -1, 0, 0],
-                                [0, -1, 0, 0, 0, 0, 0, 0, -1, -1]]).double()  # (2, 10)
-        self.b = torch.tensor([0, 0]).double()  # (2, )
+                                [0, -1, 0, 0, 0, 0, 0, 0, -1, -1]])  # (2, 10)
+        self.b = torch.tensor([0, 0])  # (2, )
 
         self.constrained_indexes = list(set([index for index in torch.nonzero(self.B)[:, -1].tolist()]))
         self.unconstrained_indexes = [item for item in range(self.B.shape[1]) if item not in self.constrained_indexes]

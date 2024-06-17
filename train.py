@@ -7,6 +7,7 @@ from utils import LoadModel, get_optimizer, get_loss_func, get_violation, PINNLo
 import copy
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
+torch.set_default_dtype(torch.float32)
 
 
 def run_training(args, data):
@@ -21,7 +22,7 @@ def run_training(args, data):
     train_violations = []
     val_violations = []
 
-    lambda_k = torch.zeros(data['A'].shape[0], requires_grad=False).double().to(device)
+    lambda_k = torch.zeros(data['A'].shape[0], requires_grad=False).to(device)
     c_best = torch.tensor(np.inf)
 
     for epoch in range(args.epochs):
@@ -98,6 +99,8 @@ def optimizer_step(model, optimizer, loss_func, X, Y, args, data, lambda_k=None,
         return loss.item()
     elif isinstance(loss_func, ALMLoss):
         for sub_iteration in range(args.max_subiter + 1):
+            # if sub_iteration % 100 == 0:
+            #     print(f'sub_iteration: {sub_iteration}')
             model.train()
             optimizer.zero_grad()
             pred = model(X)
@@ -216,7 +219,7 @@ def evaluate_model(data, args):
             for batch_idx, (X, Y) in enumerate(data['test_loader']):
                 X, Y = X.to(device), Y.to(device)
                 pred = model(X)
-                e = torch.ones((X.shape[0], 1)).double().to(device)
+                e = torch.ones((X.shape[0], 1)).to(device)
                 pred = torch.mm(X, Astar.T) + torch.mm(pred, Bstar.T) + torch.mm(e, bstar.unsqueeze(1).T)
                 loss = loss_func(pred, Y)
                 for constrained_index in data['constrained_indexes']:
