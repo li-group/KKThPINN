@@ -57,8 +57,8 @@ def run_training(args, data):
                 train_loss += mse_loss
                 train_violation += torch.abs(pred_diff.view(-1)).mean()
 
-        train_loss /= len(data['train_loader'].dataset)
-        train_violation /= len(data['train_loader'].dataset)
+        train_loss /= len(data['train_loader'])
+        train_violation /= len(data['train_loader'])
 
         val_loss, val_violation = test(model, data, args)
         train_losses.append(train_loss), train_violations.append(train_violation.detach().item())
@@ -137,8 +137,8 @@ def test(model, data, args):
                 loss = loss_func(pred, Y)
                 test_loss += loss.item()
             test_violation += torch.abs(pred_diff.view(-1)).mean()
-    test_loss /= len(data['val_loader'].dataset)  # Test set Average loss
-    test_violation /= len(data['val_loader'].dataset)  # Test set Average violation
+    test_loss /= len(data['val_loader'])  # Test set Average loss
+    test_violation /= len(data['val_loader'])  # Test set Average violation
     return test_loss, test_violation
 
 
@@ -174,28 +174,23 @@ def evaluate_model(data, args):
             pred_diff = get_violation(args, data, X, pred)
             loss = loss_func(pred, Y)
 
-            constrained_loss = torch.tensor(0)
-            unconstrained_loss = torch.tensor(0)
-
             for constrained_index in data['constrained_indexes']:
-                constrained_loss = loss_func(pred[:, constrained_index], Y[:, constrained_index])
+                rmse_constrained = loss_func(pred[:, constrained_index], Y[:, constrained_index]).item()
             for unconstrained_index in data['unconstrained_indexes']:
-                unconstrained_loss = loss_func(pred[:, unconstrained_index], Y[:, unconstrained_index])
+                rmse_unconstrained = loss_func(pred[:, unconstrained_index], Y[:, unconstrained_index]).item()
             rmse_total += loss.item()
-            rmse_unconstrained += unconstrained_loss.item()
-            rmse_constrained += constrained_loss.item()
             violation += torch.abs(pred_diff.view(-1)).mean()
 
-        rmse_total /= len(data['test_loader'].dataset)
+        rmse_total /= len(data['test_loader'])
         rmse_total = np.sqrt(rmse_total)
 
-        rmse_unconstrained /= len(data['test_loader'].dataset)
+        rmse_unconstrained /= len(data['test_loader'])
         rmse_unconstrained = np.sqrt(rmse_unconstrained)
 
-        rmse_constrained /= len(data['test_loader'].dataset)
+        rmse_constrained /= len(data['test_loader'])
         rmse_constrained = np.sqrt(rmse_constrained)
 
-        violation /= len(data['test_loader'].dataset)
+        violation /= len(data['test_loader'])
         violation = violation.item()
 
     scores = {'rmse_total': rmse_total, 'rmse_unconstrained': rmse_unconstrained, 'rmse_constrained': rmse_constrained,
@@ -223,22 +218,20 @@ def evaluate_model(data, args):
                 pred = torch.mm(X, Astar.T) + torch.mm(pred, Bstar.T) + torch.mm(e, bstar.unsqueeze(1).T)
                 loss = loss_func(pred, Y)
                 for constrained_index in data['constrained_indexes']:
-                    constrained_loss = loss_func(pred[:, constrained_index], Y[:, constrained_index])
+                    post_rmse_constrained = loss_func(pred[:, constrained_index], Y[:, constrained_index]).item()
                 for unconstrained_index in data['unconstrained_indexes']:
-                    unconstrained_loss = loss_func(pred[:, unconstrained_index], Y[:, unconstrained_index])
+                    post_rmse_unconstrained = loss_func(pred[:, unconstrained_index], Y[:, unconstrained_index]).item()
                 post_rmse_total += loss.item()
-                post_rmse_unconstrained += unconstrained_loss.item()
-                post_rmse_constrained += constrained_loss.item()
 
-            post_rmse_total /= len(data['test_loader'].dataset)
+            post_rmse_total /= len(data['test_loader'])
             post_rmse_total = np.sqrt(post_rmse_total)
             scores.update({'post_rmse_total': post_rmse_total})
 
-            post_rmse_unconstrained /= len(data['test_loader'].dataset)
+            post_rmse_unconstrained /= len(data['test_loader'])
             post_rmse_unconstrained = np.sqrt(post_rmse_unconstrained)
             scores.update({'post_rmse_unconstrained': post_rmse_unconstrained})
 
-            post_rmse_constrained /= len(data['test_loader'].dataset)
+            post_rmse_constrained /= len(data['test_loader'])
             post_rmse_constrained = np.sqrt(post_rmse_constrained)
             scores.update({'post_rmse_constrained': post_rmse_constrained})
 
