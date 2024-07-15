@@ -179,6 +179,8 @@ def evaluate_model(data, args):
             for unconstrained_index in data['unconstrained_indexes']:
                 rmse_unconstrained = loss_func(pred[:, unconstrained_index], Y[:, unconstrained_index]).item()
             rmse_total += loss.item()
+            rmse_constrained /= len(data['constrained_indexes'])
+            rmse_unconstrained /= len(data['unconstrained_indexes'])
             violation += torch.abs(pred_diff.view(-1)).mean()
 
         rmse_total /= len(data['test_loader'])
@@ -221,6 +223,8 @@ def evaluate_model(data, args):
                     post_rmse_constrained = loss_func(pred[:, constrained_index], Y[:, constrained_index]).item()
                 for unconstrained_index in data['unconstrained_indexes']:
                     post_rmse_unconstrained = loss_func(pred[:, unconstrained_index], Y[:, unconstrained_index]).item()
+                post_rmse_constrained /= len(data['constrained_indexes'])
+                post_rmse_unconstrained /= len(data['unconstrained_indexes'])
                 post_rmse_total += loss.item()
 
             post_rmse_total /= len(data['test_loader'])
