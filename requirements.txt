@@ -1,8 +1,6 @@
-torch
-torchvision
-torchaudio
-numpy
+torch==1.12.1
+numpy==1.24.3
 argparse
-scikit-learn
-pandas
+scikit-learn==1.1.3
+pandas==1.5.3
 
