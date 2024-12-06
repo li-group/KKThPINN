@@ -175,9 +175,9 @@ def evaluate_model(data, args):
             loss = loss_func(pred, Y)
 
             for constrained_index in data['constrained_indexes']:
-                rmse_constrained = loss_func(pred[:, constrained_index], Y[:, constrained_index]).item()
+                rmse_constrained += loss_func(pred[:, constrained_index], Y[:, constrained_index]).item()
             for unconstrained_index in data['unconstrained_indexes']:
-                rmse_unconstrained = loss_func(pred[:, unconstrained_index], Y[:, unconstrained_index]).item()
+                rmse_unconstrained += loss_func(pred[:, unconstrained_index], Y[:, unconstrained_index]).item()
             rmse_total += loss.item()
             rmse_constrained /= len(data['constrained_indexes'])
             rmse_unconstrained /= len(data['unconstrained_indexes'])
@@ -220,9 +220,9 @@ def evaluate_model(data, args):
                 pred = torch.mm(X, Astar.T) + torch.mm(pred, Bstar.T) + torch.mm(e, bstar.unsqueeze(1).T)
                 loss = loss_func(pred, Y)
                 for constrained_index in data['constrained_indexes']:
-                    post_rmse_constrained = loss_func(pred[:, constrained_index], Y[:, constrained_index]).item()
+                    post_rmse_constrained += loss_func(pred[:, constrained_index], Y[:, constrained_index]).item()
                 for unconstrained_index in data['unconstrained_indexes']:
-                    post_rmse_unconstrained = loss_func(pred[:, unconstrained_index], Y[:, unconstrained_index]).item()
+                    post_rmse_unconstrained += loss_func(pred[:, unconstrained_index], Y[:, unconstrained_index]).item()
                 post_rmse_constrained /= len(data['constrained_indexes'])
                 post_rmse_unconstrained /= len(data['unconstrained_indexes'])
                 post_rmse_total += loss.item()

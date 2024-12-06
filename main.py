@@ -3,6 +3,7 @@ from train import run_training
 import argparse
 import time
 import copy
+import os
 
 
 def add_arguments():
@@ -10,11 +11,11 @@ def add_arguments():
 
     parser.add_argument('--model', type=str, default='KKThPINN', help='NN, PINN, KKThPINN')
     parser.add_argument('--model_id', type=str)
-    parser.add_argument('--input_dim', type=int, default=3,
+    parser.add_argument('--input_dim', type=int, default=4,
                         help='3 for cstr, 4 for plant, 5 for distillation')
     parser.add_argument('--hidden_dim', type=int, default=32)
     parser.add_argument('--hidden_num', type=int, default=2)
-    parser.add_argument('--z0_dim', type=int, default=3,
+    parser.add_argument('--z0_dim', type=int, default=5,
                         help='3 for cstr, 5 for plant, 10 for distillation')
 
     parser.add_argument('--optimizer', type=str, default='adam')
@@ -40,6 +41,12 @@ def add_arguments():
 
 def main(args):
     if args.job == 'train':
+        if not os.path.exists(f'./models/{args.dataset_type}/{args.model}/{args.val_ratio}'):
+            os.makedirs(f'./models/{args.dataset_type}/{args.model}/{args.val_ratio}')
+        if not os.path.exists(f'./data/learning_curves/{args.dataset_type}/{args.model}/{args.val_ratio}'):
+            os.makedirs(f'./data/learning_curves/{args.dataset_type}/{args.model}/{args.val_ratio}')
+        if not os.path.exists(f'./data/tables/{args.dataset_type}/{args.model}/{args.val_ratio}'):
+            os.makedirs(f'./data/tables/{args.dataset_type}/{args.model}/{args.val_ratio}')
         if args.model == 'NN':
             args.loss_type = 'MSE'
         elif args.model == 'PINN':
@@ -59,6 +66,12 @@ def main(args):
         for i in range(args.runs):
             for model_name in ['NN', 'PINN', 'KKThPINN', 'ECNN']:
                 args.model = model_name
+                if not os.path.exists(f'./models/{args.dataset_type}/{args.model}/{args.val_ratio}'):
+                    os.makedirs(f'./models/{args.dataset_type}/{args.model}/{args.val_ratio}')
+                if not os.path.exists(f'./data/learning_curves/{args.dataset_type}/{args.model}/{args.val_ratio}'):
+                    os.makedirs(f'./data/learning_curves/{args.dataset_type}/{args.model}/{args.val_ratio}')
+                if not os.path.exists(f'./data/tables/{args.dataset_type}/{args.model}/{args.val_ratio}'):
+                    os.makedirs(f'./data/tables/{args.dataset_type}/{args.model}/{args.val_ratio}')
                 if args.model == 'NN':
                     args.loss_type = 'MSE'
                 elif args.model == 'PINN':
@@ -75,6 +88,14 @@ def main(args):
 
 
 if __name__ == '__main__':
+    if not os.path.exists(f'./models'):
+        os.makedirs(f'./models')
+    if not os.path.exists(f'./data'):
+        os.makedirs(f'./data')
+    if not os.path.exists(f'./data/learning_curves'):
+        os.makedirs(f'./data/learning_curves')
+    if not os.path.exists(f'./data/tables'):
+        os.makedirs(f'./data/tables')
     args = add_arguments()
     print(args)
     main(args)

@@ -1,15 +1,19 @@
 # KKT-hPINN: Physics-Informed Neural Networks with Hard Linear Equality Constraints for Surrogate Modeling
-Welcome to the KKT-hPINN paper page. This code belongs to a paper currently under review, and the preprint can be found at arxiv: [https://arxiv.org/abs/2402.07251](https://arxiv.org/abs/2402.07251)
+Welcome to the KKT-hPINN paper page. This code belongs to the [paper](https://www.sciencedirect.com/science/article/abs/pii/S0098135424001820) published in Computers & Chemical Engineering.
 
-If you found this work useful, please cite this [preprint](https://arxiv.org/abs/2402.07251) ❤️:
+If you found this work useful, please cite this [paper](https://www.sciencedirect.com/science/article/abs/pii/S0098135424001820) ❤️:
 ```bibtex
-@misc{chen2024physicsinformed,
-      title={Physics-Informed Neural Networks with Hard Linear Equality Constraints}, 
-      author={Hao Chen and Gonzalo E. Constante Flores and Can Li},
-      year={2024},
-      eprint={2402.07251},
-      archivePrefix={arXiv},
-      primaryClass={cs.LG}
+@article{CHEN2024108764,
+title = {Physics-informed neural networks with hard linear equality constraints},
+journal = {Computers & Chemical Engineering},
+volume = {189},
+pages = {108764},
+year = {2024},
+issn = {0098-1354},
+doi = {https://doi.org/10.1016/j.compchemeng.2024.108764},
+url = {https://www.sciencedirect.com/science/article/pii/S0098135424001820},
+author = {Hao Chen and Gonzalo E. Constante Flores and Can Li},
+keywords = {Surrogate modeling, Physics-informed neural network, Artificial intelligence}
 }
 ```
 
@@ -21,22 +25,7 @@ In all case studies, KKT-hPINN demonstrates enhanced predictive capability as su
 # Installation
 ```pip install -r requirements.txt```
 
-# Test it on your device
-To run the KKT-hPINN and compare it with non-constrained NN and soft-constrained PINN
+# Quick Start
+To run the KKT-hPINN and compare it with non-constrained NN, soft-constrained PINN and equality completion NN, 
 
 ```python main.py --model_id MODELID --dataset_type plant --dataset_path benchmark_plant.csv --job experiment```
-
-For other setups: --dataset_type can be either cstr, plant or distillation; --dataset_path can be either benchmark_CSTR.csv, benchmark_plant.csv or benchmark_distillation.csv; Adjust the hyperparameters correspondingly.
-
-```mkdir data models```
-
-```mkdir data/learning_curves data/tables```
-
-Create their sub-folders for the specific dataset, model, val_ratio in the following order if they do not exist.
-
-```mkdir data/learning_curves/dataset/model/val_ratio```
-
-```mkdir data/tables/dataset/model/val_ratio```
-
-```mkdir models/dataset/model/val_ratio```
-
